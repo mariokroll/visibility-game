@@ -1,1 +1,4 @@
 .env/
+./src/__pycache__
+./src/algorithms/__pycache__
+./src/scenes/__pycache__
