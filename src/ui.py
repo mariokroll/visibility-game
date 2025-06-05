@@ -36,10 +36,13 @@ class Button:
         width,
         height,
         text,
-        color=(0, 0, 0),
+        color=(252, 224, 192),
         text_color=(255, 255, 255),
+        hover_color=(255, 246, 232),
         font_size=30,
         action=None,
+        font_path="./fonts/nunito/Nunito-Regular.ttf",
+        border_radius=5,
     ):
         """
         Constructor for the Button class
@@ -65,11 +68,14 @@ class Button:
         """
         self.rect = pygame.Rect(x, y, width, height)
         self.color = color
+        self.hover_color = hover_color
+        self.button_color = color
         self.text = text
         self.text_color = text_color
         self.font_size = font_size
-        self.font = pygame.font.Font(None, self.font_size)
+        self.font = pygame.font.Font(font_path, self.font_size)
         self.action = action
+        self.border_radius = border_radius
 
     def draw(self, screen: pygame.Surface):
         """
@@ -80,26 +86,44 @@ class Button:
         screen: pygame.Surface
             Surface to draw the button on
         """
-        pygame.draw.rect(screen, self.color, self.rect)
+        pygame.draw.rect(
+            screen, self.color, self.rect, border_radius=self.border_radius
+        )
         text = self.font.render(self.text, True, self.text_color)
         text_rect = text.get_rect(center=self.rect.center)
         screen.blit(text, text_rect)
 
-    def is_clicked(self, pos):
+    def is_hovered(self) -> bool:
+        """
+        Method to check if the button is hovered
+
+        Returns
+        -------
+        bool
+            True if the button is hovered, False otherwise
+        """
+        if self.rect.collidepoint(pygame.mouse.get_pos()):
+            self.color = self.hover_color
+            return True
+        else:
+            self.color = self.button_color
+            return False
+
+    def is_clicked(self, event) -> bool:
         """
         Method to check if the button is clicked
 
         Parameters
         ----------
-        pos: tuple
-            Position of the click
+        event: pygame.event.Event
+            Event to check
 
         Returns
         -------
         bool
             True if the button is clicked, False otherwise
         """
-        return self.rect.collidepoint(pos)
+        return event.type == pygame.MOUSEBUTTONDOWN and self.is_hovered()
 
     def handle_event(self, event, *args):
         """
@@ -110,10 +134,8 @@ class Button:
         event: pygame.event.Event
             Event to handle
         """
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            pos = pygame.mouse.get_pos()
-            if self.is_clicked(pos) and self.action:
-                self.action(*args)
+        if self.is_clicked(event) and self.action:
+            self.action(*args)
 
 
 class Slider:
@@ -160,11 +182,12 @@ class Slider:
         max_value,
         start_value,
         color=(0, 0, 0),
-        text_color=(255, 0, 0),
+        text_color=(0, 0, 0),
         font_size=30,
         background_color=(0, 0, 255),
-        knob_color=(125, 125, 0),
+        knob_color=(251, 185, 109),
         title="",
+        font_path="./fonts/nunito/Nunito-Regular.ttf",
     ):
         """
         Constructor for the Slider class
@@ -201,15 +224,21 @@ class Slider:
         self.width = width
         self.height = height
         self.rect = pygame.Rect(x, y, width, height)
-        self.background = pygame.Rect(x - 10, y - 10, width + 45, height + 20)
         self.background_color = background_color
         self.color = color
         self.text_color = text_color
         self.font_size = font_size
-        self.font = pygame.font.Font(None, self.font_size)
+        self.font = pygame.font.Font(font_path, self.font_size)
         self.min_value = min_value
         self.max_value = max_value
         self.value = start_value
+        text_width, text_height = self.font.size(str(self.max_value))
+        self.background = pygame.Rect(
+            self.x - 10,
+            self.y - text_height // 2,
+            self.width + text_width + 40,
+            self.height + text_height,
+        )
         self.knob_radius = 10
         self.knob_x = (
             self.x
@@ -253,7 +282,7 @@ class Slider:
         screen: pygame.Surface
             Surface to draw the slider on
         """
-        pygame.draw.rect(screen, self.background_color, self.background, 3)
+        pygame.draw.rect(screen, self.background_color, self.background, 2)
         pygame.draw.rect(screen, self.color, self.rect)
         pygame.draw.circle(
             screen,
@@ -262,14 +291,14 @@ class Slider:
             self.knob_radius,
         )
         text = self.font.render(str(self.value), True, self.text_color)
-        text_rect = text.get_rect(
-            center=(self.x + self.width + 20, self.y + self.height // 2)
-        )
+        text_rect = text.get_rect(centery=self.rect.centery)
+        text_rect.x = self.x + self.width + 10
 
         if self.title:
             title = self.font.render(self.title, True, self.text_color)
+            title_height = title.get_height()
             title_rect = title.get_rect(
-                center=(self.x + 100, self.y - self.height - 10)
+                bottomleft=(self.x - 10, self.y - title_height // 2)
             )
             screen.blit(title, title_rect)
         screen.blit(text, text_rect)
