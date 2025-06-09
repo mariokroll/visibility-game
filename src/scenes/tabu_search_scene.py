@@ -31,6 +31,18 @@ class TabuSearchScene(SolverScene):
         self.radius = radius
         self.tabu_size = tabu_size
         self.max_iter = max_iter
+        self.initial_solution = None
+
+    def set_initial_solution(self, initial_solution):
+        """
+        Sets the initial solution for the algorithm
+
+        Parameters
+        ----------
+        initial_solution: np.ndarray
+            Initial solution to set
+        """
+        self.initial_solution = initial_solution
 
     def set_polygon(self, polygon):
         """
@@ -48,6 +60,7 @@ class TabuSearchScene(SolverScene):
             radius=self.radius,
             tabu_size=self.tabu_size,
             max_iter=self.max_iter,
+            initial_solution=self.initial_solution,
         )
 
     def draw(self, screen):
@@ -64,6 +77,7 @@ class TabuSearchScene(SolverScene):
         pygame.draw.rect(screen, (0, 0, 0), (5, 120, 790, 495), 1)
         self.draw_description(screen)
         self.draw_area(screen)
+        self.draw_status_text(screen)
 
         for button in self.buttons:
             button.draw(screen)

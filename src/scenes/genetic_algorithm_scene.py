@@ -72,11 +72,14 @@ class GeneticAlgorithmScene(SolverScene):
         pygame.draw.rect(screen, (0, 0, 0), (5, 120, 790, 495), 1)
         self.draw_description(screen)
         self.draw_area(screen)
+        self.draw_status_text(screen)
+
         for button in self.buttons:
             button.draw(screen)
         if self.algorithm:
             for point in self.algorithm.population:
                 pygame.draw.circle(screen, (255, 0, 0), point, 2)
+
         if self.algorithm and self.algorithm.best_solution:
             self.best_solution = self.algorithm.best_solution
             if self.finished:

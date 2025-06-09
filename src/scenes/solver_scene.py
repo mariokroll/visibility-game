@@ -1,6 +1,7 @@
 import pygame
-import numpy as np
-from src.polygon import Polygon
+import threading
+import time
+
 from src.ui import Button
 from src.scenes import Scene
 
@@ -65,17 +66,10 @@ class SolverScene(Scene):
         self.area_text = "Área: "
         self.area = 0.0
         self.polygon_area = 0.0
-
-    def set_polygon(self, polygon):
-        """
-        Sets the polygon to solve
-
-        Parameters
-        ----------
-        polygon: list
-            Polygon to solve
-        """
-        self.polygon = Polygon(polygon)
+        self._thread = None
+        self.dots_count = 0
+        self.running_text = ""
+        self.last_update_time = time.time()
 
     def set_radius(self, radius):
         """
@@ -108,6 +102,18 @@ class SolverScene(Scene):
         pygame.mouse.set_cursor(
             pygame.SYSTEM_CURSOR_HAND if hovering else pygame.SYSTEM_CURSOR_ARROW
         )
+        if self._thread and self._thread.is_alive():
+            now = time.time()
+            if now - self.last_update_time > 0.4:
+                self.dots_count = (self.dots_count % 3) + 1
+                self.running_text = "Corriendo código" + "." * self.dots_count
+                self.last_update_time = now
+        elif self._thread and not self._thread.is_alive():
+            self._thread = None
+            self.running_text = ""
+            self.dots_count = 0
+        if self.finished:
+            self.running_text = "Terminado!"
 
     def one_interation(self):
         """
@@ -120,17 +126,43 @@ class SolverScene(Scene):
         """
         Performs ten iterations of the algorithm
         """
-        for _ in range(10):
-            if not self.algorithm.step():
-                self.finished = True
-                break
+        if not (self._thread and self._thread.is_alive()):
+            self.finished = False
+            self.running_text = "Corriendo código"
+            self.dots_count = 1
+            self.last_update_time = time.time()
+
+            def _run_10_iterations():
+                """
+                Runs ten iterations of the algorithm in a separate thread
+                """
+                for _ in range(10):
+                    if not self.algorithm.step():
+                        self.finished = True
+                        break
+
+            self._thread = threading.Thread(target=_run_10_iterations, daemon=True)
+            self._thread.start()
 
     def solve(self):
         """
         Solves the problem completely
         """
-        self.algorithm.run()
-        self.finished = True
+        if not (self._thread and self._thread.is_alive()):
+            self.finished = False
+            self.running_text = "Corriendo código"
+            self.dots_count = 1
+            self.last_update_time = time.time()
+
+            def _run_algorithm():
+                """
+                Runs the algorithm in a separate thread
+                """
+                self.algorithm.run()
+                self.finished = True
+
+            self._thread = threading.Thread(target=_run_algorithm, daemon=True)
+            self._thread.start()
 
     def draw_description(self, screen):
         """
@@ -171,6 +203,20 @@ class SolverScene(Scene):
                 percentage_text = f"Área cubierta: {percentage:.2f}%"
                 text = font.render(percentage_text, True, (0, 0, 0))
                 screen.blit(text, (550, 35))
+
+    def draw_status_text(self, screen):
+        """
+        Draws the status text on the screen
+
+        Parameters
+        ----------
+        screen: pygame.Surface
+            Surface to draw the status text on
+        """
+        font = pygame.font.Font("./fonts/nunito/Nunito-Light.ttf", 15)
+        status_text = self.running_text
+        text = font.render(status_text, True, (0, 0, 0))
+        screen.blit(text, (550, 100))
 
     def draw(self, screen):
         """

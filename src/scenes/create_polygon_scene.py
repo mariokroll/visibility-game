@@ -79,7 +79,6 @@ class CreatePolygonScene(Scene):
         for button in self.buttons:
             button.handle_event(event)
         self.slider.handle_event(event)
-        self.save_button.handle_event(event, self.polygon)
 
     def generate_polygon(self):
         """

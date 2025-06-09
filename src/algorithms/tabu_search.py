@@ -21,6 +21,7 @@ class TabuSearch:
         radius: float,
         tabu_size: int = 50,
         max_iter: int = 200,
+        initial_solution: np.ndarray = None,
     ) -> None:
         """
         Constructor for TabuSearch.
@@ -42,7 +43,10 @@ class TabuSearch:
         self.max_iter = max_iter
         self.tabu_list = []  # list of recent points
 
-        first_solution = self._random_point()
+        if initial_solution is not None:
+            first_solution = initial_solution
+        else:
+            first_solution = self._random_point()
         first_fitness = self._evaluate(first_solution)
         self.best_solution = (first_solution, first_fitness)
         self.previous_solutions = []
@@ -92,7 +96,7 @@ class TabuSearch:
         directions = np.array(
             [np.array([dx, dy]) for dx in [-1, 0, 1] for dy in [-1, 0, 1]]
         )
-        random_advance = np.random.normal(0, 1, size=directions.shape)
+        random_advance = np.random.normal(0, 0.2, size=directions.shape)
         candidates = p + directions + random_advance
         # filter candidates to be inside the polygon
         neighbors = []

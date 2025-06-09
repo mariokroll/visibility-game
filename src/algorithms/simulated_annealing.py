@@ -23,6 +23,7 @@ class SimulatedAnnealing:
         alpha: float = 0.999,
         min_temp: float = 1e-3,
         max_iter: int = 10000,
+        initial_solution: np.ndarray = None,
     ) -> None:
         """
         Constructor for Simulated Annealing.
@@ -49,7 +50,10 @@ class SimulatedAnnealing:
         self.min_temp = min_temp
         self.max_iter = max_iter
         self.iteration = 0
-        first_point = self._random_point()
+        if initial_solution is not None:
+            first_point = initial_solution
+        else:
+            first_point = self._random_point()
         self.best_solution = (first_point, self._evaluate(first_point))
         self.previous_solutions = []
 

@@ -37,6 +37,18 @@ class SimulatedAnnealingScene(SolverScene):
         self.alpha = alpha
         self.min_temp = min_temp
         self.max_iter = max_iter
+        self.initial_solution = None
+
+    def set_initial_solution(self, initial_solution):
+        """
+        Sets the initial solution for the algorithm
+
+        Parameters
+        ----------
+        initial_solution: np.ndarray
+            Initial solution to set
+        """
+        self.initial_solution = initial_solution
 
     def set_polygon(self, polygon):
         """
@@ -56,6 +68,7 @@ class SimulatedAnnealingScene(SolverScene):
             alpha=self.alpha,
             min_temp=self.min_temp,
             max_iter=self.max_iter,
+            initial_solution=self.initial_solution,
         )
         self.best_solution = self.algorithm.get_best()
 
@@ -73,6 +86,7 @@ class SimulatedAnnealingScene(SolverScene):
         pygame.draw.rect(screen, (0, 0, 0), (5, 120, 790, 495), 1)
         self.draw_description(screen)
         self.draw_area(screen)
+        self.draw_status_text(screen)
 
         for button in self.buttons:
             button.draw(screen)

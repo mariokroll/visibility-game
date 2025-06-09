@@ -12,6 +12,7 @@ from src.scenes.menu_scene import MenuScene
 from src.scenes.draw_polygon_scene import DrawPolygonScene
 from src.scenes.create_polygon_scene import CreatePolygonScene
 from src.scenes.load_polygon_scene import LoadPolygonScene
+from src.scenes.apply_random_search_scene import ApplyRandomSearchScene
 from src.scenes.genetic_algorithm_scene import GeneticAlgorithmScene
 from src.scenes.tabu_search_scene import TabuSearchScene
 from src.scenes.simulated_annealing_scene import SimulatedAnnealingScene
@@ -44,6 +45,7 @@ def main():
     scene_manager.add_scene("draw_polygon", DrawPolygonScene(scene_manager))
     scene_manager.add_scene("create_polygon", CreatePolygonScene(scene_manager))
     scene_manager.add_scene("load_polygon", LoadPolygonScene(scene_manager))
+    scene_manager.add_scene("random_search", ApplyRandomSearchScene(scene_manager))
     scene_manager.add_scene("genetic_algorithm", GeneticAlgorithmScene(scene_manager))
     scene_manager.add_scene("tabu_search", TabuSearchScene(scene_manager))
     scene_manager.add_scene(

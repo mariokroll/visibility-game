@@ -79,7 +79,8 @@ class ChooseAlgorithmScene(Scene):
         """
         Starts the simulated annealing algorithm
         """
-        self.manager.set_scene("simulated_annealing")
+        self.manager.set_scene("random_search")
+        self.manager.current_scene.set_algorithm("simulated_annealing")
         self.manager.current_scene.set_radius(self.radius)
         self.manager.current_scene.set_polygon(self.polygon)
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
@@ -97,7 +98,8 @@ class ChooseAlgorithmScene(Scene):
         """
         Starts the tabu search algorithm
         """
-        self.manager.set_scene("tabu_search")
+        self.manager.set_scene("random_search")
+        self.manager.current_scene.set_algorithm("tabu_search")
         self.manager.current_scene.set_radius(self.radius)
         self.manager.current_scene.set_polygon(self.polygon)
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)

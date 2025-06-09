@@ -24,7 +24,7 @@ class GeneticAlgorithm:
         pc: float = 0.85,
         pm: float = 0.1,
         max_generations: int = 200,
-        stagnation: int = 100,
+        stagnation: int = 20,
     ) -> None:
         """
         Constructor for GeneticAlgorithm.
@@ -38,9 +38,9 @@ class GeneticAlgorithm:
         population_size : int, optional
             Size of the population (default is number of vertices).
         pc : float, optional
-            Crossover probability (default is 0.8).
+            Crossover probability (default is 0.85).
         pm : float, optional
-            Mutation probability (default is 0.05).
+            Mutation probability (default is 0.1).
         max_generations : int, optional
             Maximum number of generations (default is 100).
         stagnation : int, optional
@@ -164,8 +164,7 @@ class GeneticAlgorithm:
         bool
             True if the algorithm should continue, False otherwise.
         """
-        if self.generation > self.max_generations:
-            print("Terminado")
+        if self.generation > self.max_generations or self.no_improve >= self.stagnation:
             return False
         new_pop = []
         new_fitness = []
@@ -175,12 +174,15 @@ class GeneticAlgorithm:
             child = self._crossover(p1, p2)
             child = self._mutate(child)
             new_pop.append(child)
-            new_fitness.append(self._evaluate(child))
+            new_child_fitness = self._evaluate(child)
+            if new_child_fitness >= 2.0 * np.pi * self.radius**2:
+                return False
+            new_fitness.append(new_child_fitness)
         prev_best_fitness = self.best_solution[1]
         self.population = new_pop
         self.fitness = new_fitness
         self.best_solution = max(zip(self.population, self.fitness), key=lambda x: x[1])
-        if self.best_solution[1] - prev_best_fitness < 0.01:
+        if self.best_solution[1] - prev_best_fitness > 5:
             self.no_improve = 0
         else:
             self.no_improve += 1
@@ -196,28 +198,10 @@ class GeneticAlgorithm:
         tuple
             Best solution found (point, fitness).
         """
-        i = 0
         while (
             self.generation < self.max_generations and self.no_improve < self.stagnation
         ):
             self.step()
-            # if i % 100 == 0:
-            #     print(self.fitness)
-            #     plt.scatter(
-            #         [p[0] for p in self.population],
-            #         [p[1] for p in self.population],
-            #         c="blue",
-            #         alpha=0.5,
-            #     )
-            #     plt.scatter(
-            #         self.best_solution[0][0],
-            #         self.best_solution[0][1],
-            #         c="red",
-            #         label=self.best_solution,
-            #     )
-            #     plt.plot(self.polygon[:, 0], self.polygon[:, 1], "r-", label="Polygon")
-            #     plt.legend()
-            #     plt.show()
         print("Terminado")
         return self.get_best()
 
