@@ -28,7 +28,7 @@ class ChooseAlgorithmScene(Scene):
         self.button_title = "Algoritmos metaheurísticos:"
         self.buttons = [
             Button(
-                50,
+                100,
                 170,
                 200,
                 90,
@@ -39,7 +39,7 @@ class ChooseAlgorithmScene(Scene):
                 border_radius=20,
             ),
             Button(
-                300,
+                500,
                 170,
                 200,
                 90,
@@ -50,8 +50,8 @@ class ChooseAlgorithmScene(Scene):
                 border_radius=20,
             ),
             Button(
-                550,
-                170,
+                100,
+                300,
                 200,
                 90,
                 "Búsqueda Tabú",
@@ -60,10 +60,21 @@ class ChooseAlgorithmScene(Scene):
                 text_color=(0, 0, 0),
                 border_radius=20,
             ),
+            Button(
+                500,
+                300,
+                200,
+                90,
+                "Experimentar",
+                action=self.toying_with_concept,
+                font_size=20,
+                text_color=(0, 0, 0),
+                border_radius=20,
+            ),
         ]
         self.radius_slider = Slider(
             70,
-            400,
+            500,
             600,
             7,
             min_value=10,
@@ -102,6 +113,15 @@ class ChooseAlgorithmScene(Scene):
         self.manager.current_scene.set_algorithm("tabu_search")
         self.manager.current_scene.set_radius(self.radius)
         self.manager.current_scene.set_polygon(self.polygon)
+        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+
+    def toying_with_concept(self):
+        """
+        Starts the toying with concept scene
+        """
+        self.manager.set_scene("toying_with_concept")
+        self.manager.current_scene.set_polygon(self.polygon)
+        self.manager.current_scene.set_radius(self.radius)
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
 
     def handle_event(self, event):
