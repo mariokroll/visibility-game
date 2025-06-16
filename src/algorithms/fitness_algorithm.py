@@ -107,13 +107,21 @@ def calculate_fitness_area(
         point, radius, visibility_polygon
     )
     if intersection_points.shape[0] == 0:
-        if return_polygon:
-            return np.pi * radius**2, []
-        return np.pi * radius**2  # No intersection, full area
+        # Check if the radius is smaller than the distance to the first point.
+        # If not, return the full area of the circle.
+        if np.linalg.norm(point - visibility_polygon[0]) > radius:
+            if return_polygon:
+                return np.pi * radius**2, []
+            return np.pi * radius**2  # No intersection, full area
+        # If the radius is larger, return the area of the visibility polygon.
+        else:
+            area = polygon_area(visibility_polygon)
+            if return_polygon:
+                return area, [visibility_polygon]
+            return area
 
     # Iterate for every pair of intersection points
     area = 0.0
-    # plot_polygon(new_polygon, color="blue", marker="x")
     for i in range(intersection_points.shape[0]):
         p0 = intersection_points[i]
         p1 = intersection_points[(i + 1) % intersection_points.shape[0]]
@@ -136,13 +144,10 @@ def calculate_fitness_area(
             )
             angle += np.pi * 2.0
         if np.linalg.norm(intersection_point - point) < radius:
-            # TODO
             # Calculate the area of the polygon formed by the polygon vertices between
             # the intersection points and the point
             target_polygon = calculate_polygon(new_polygon, point, p0, p1, atol=atol)
-            # print(target_polygon)
             area += polygon_area(np.array(target_polygon))
-            # plot_polygon(np.array(target_polygon), color="green", marker="o")
             if return_polygon:
                 sections.append(target_polygon)
         else:
@@ -152,7 +157,6 @@ def calculate_fitness_area(
                 sections.append(np.array([p0, p1]))
     if return_polygon:
         return (area, sections)
-    # plt.show()
     return area
 
 
@@ -186,9 +190,19 @@ def calculate_fitness_area2(
         point, radius, visibility_polygon
     )
 
-    # REVIEW: TODO
     if intersection_points.shape[0] == 0:
-        return np.pi * radius**2  # No intersection, full area
+        # Check if the radius is smaller than the distance to the first point.
+        # If not, return the full area of the circle.
+        if np.linalg.norm(point - visibility_polygon[0]) > radius:
+            if return_polygon:
+                return np.pi * radius**2, []
+            return np.pi * radius**2  # No intersection, full area
+        # If the radius is larger, return the area of the visibility polygon.
+        else:
+            area = polygon_area(visibility_polygon)
+            if return_polygon:
+                return area, [visibility_polygon]
+            return area
 
     if return_polygon:
         sections = []
@@ -205,7 +219,6 @@ def calculate_fitness_area2(
     i = 0  # Index of the next vertex in the polygon
     j = 0  # Index of the next intersection point
     area = 0.0
-    # plot_polygon(new_polygon, color="blue", marker="x")
     n_intersection_points = intersection_points.shape[0]
     while i < new_polygon.shape[0] - 1:
         p0 = new_polygon[i]
@@ -229,10 +242,11 @@ def calculate_fitness_area2(
                 target_polygon.append(new_polygon[i])
                 i += 1
             target_polygon.append(new_polygon[i])
+            target_polygon.append(point)
             area += polygon_area(np.array(target_polygon))
+
             if return_polygon:
                 sections.append(np.array(target_polygon))
-            # plot_polygon(np.array(target_polygon), color="green", marker="o")
         else:
             # Add the area of the circular sector
             j = (j + 1) % intersection_points.shape[0]
@@ -250,7 +264,6 @@ def calculate_fitness_area2(
                 sections.append(np.array([p0, new_polygon[i]]))
     if return_polygon:
         return (area, sections)
-    # plt.show()
     return area
 
 
@@ -332,9 +345,7 @@ def intersect_circunference_polygon(
             intersection_points.extend(points)
             new_polygon.extend(points)
     new_polygon.append(polygon[-1])
-    # plt.plot(polygon[:, 0], polygon[:, 1], "k--", marker="o")
-    # plt.plot(center[0], center[1], "ro")
-    # plt.show()
+
     return np.array(intersection_points), np.array(new_polygon)
 
 
@@ -354,52 +365,3 @@ def plot_polygon(polygon: np.ndarray, color: str = "blue", marker="x") -> None:
     """
     plt.plot(polygon[:, 0], polygon[:, 1], color=color, marker=marker, linestyle="-")
     plt.fill(polygon[:, 0], polygon[:, 1], color=color, alpha=0.3)
-
-
-# polygon = np.array(
-#     [
-#         [467, 27],
-#         [4, 290],
-#         [163, 5],
-#         [585, 1],
-#         [493, 45],
-#         [554, 135],
-#         [618, 235],
-#         [637, 378],
-#         [626, 435],
-#         [604, 356],
-#         [596, 247],
-#         [591, 388],
-#         [565, 241],
-#         [502, 190],
-#         [505, 235],
-#         [528, 372],
-#         [248, 560],
-#         [79, 559],
-#         [55, 531],
-#         [149, 368],
-#         [217, 221],
-#         [305, 129],
-#         [207, 278],
-#         [341, 128],
-#         [487, 222],
-#         [467, 27],
-#     ]
-# )
-# point = np.array([531, 131])
-# radius = 100
-# area = calculate_fitness_area(polygon, point, radius)
-# area2 = calculate_fitness_area2(polygon, point, radius)
-# print("Area of visibility:", area)
-# print("Area of visibility2:", area2)
-# # for section in sections:
-# #     # print(section)
-# #     if len(section) > 2:
-# #         plot_polygon(section, color="green", marker="v")
-# # else:
-# #     new_section = get_circular_sector_as_polygon(point, section[0], section[1])
-# #     plot_polygon(new_section, color="green", marker="o")
-# plot_polygon(polygon, color="blue")
-# plt.plot(point[0], point[1], "ro")
-# plt.grid()
-# plt.show()

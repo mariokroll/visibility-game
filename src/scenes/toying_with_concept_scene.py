@@ -174,8 +174,6 @@ class ToyingWithConceptScene(Scene):
         pygame.draw.rect(screen, (230, 230, 232), (5, 120, 790, 495), 0)
         pygame.draw.rect(screen, (0, 0, 0), (5, 120, 790, 495), 1)
         self.draw_description(screen)
-        if self.polygon is not None:
-            pygame.draw.polygon(screen, (0, 0, 0), self.polygon, 1)
         if (
             self.current_point is not None
             and self.stationary_point is None
@@ -203,3 +201,5 @@ class ToyingWithConceptScene(Scene):
                 3,
             )
         self.draw_area_text(screen)
+        if self.polygon is not None:
+            pygame.draw.polygon(screen, (0, 0, 0), self.polygon, 1)

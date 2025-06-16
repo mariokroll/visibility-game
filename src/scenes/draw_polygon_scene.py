@@ -68,7 +68,7 @@ class DrawPolygonScene(Scene):
         if len(self.polygon) < 3:
             return
         # If the polygon is not closed, close it
-        if np.allclose(self.polygon[0], self.polygon[-1]):
+        if not np.allclose(self.polygon[0], self.polygon[-1]):
             self.polygon.append(self.polygon[0])
         self.manager.set_scene("choose_algorithm")
         self.manager.current_scene.set_polygon(self.polygon)
